@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Minha Frota</title>
+<style>
+:root{--bg:#f1f4fb;--card:#fff;--tx:#141a2e;--mut:#6b7392;--bd:#e5e9f3;--pri:#4f46e5;--pri2:#2563eb;--red:#e11d48;--redbg:#fff1f4;--amb:#f59e0b;--ambbg:#fffbeb;--grn:#16a34a;--grnbg:#f0fdf4;--blu:#2563eb;--blubg:#eff6ff;--sh:0 8px 24px rgba(30,40,100,.08);color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d0f1a;--card:#181b2b;--tx:#f0f2fa;--mut:#9aa2bf;--bd:#2a2f47;--pri:#818cf8;--pri2:#60a5fa;--red:#fb7185;--redbg:#3a1420;--amb:#fbbf24;--ambbg:#332708;--grn:#4ade80;--grnbg:#10291a;--blu:#60a5fa;--blubg:#13233d;--sh:0 8px 24px rgba(0,0,0,.4);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0d0f1a;--card:#181b2b;--tx:#f0f2fa;--mut:#9aa2bf;--bd:#2a2f47;--pri:#818cf8;--pri2:#60a5fa;--red:#fb7185;--redbg:#3a1420;--amb:#fbbf24;--ambbg:#332708;--grn:#4ade80;--grnbg:#10291a;--blu:#60a5fa;--blubg:#13233d;--sh:0 8px 24px rgba(0,0,0,.4);color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0 auto;background:var(--bg);color:var(--tx);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;max-width:600px;padding-bottom:130px}
+.hero{background:linear-gradient(135deg,#4f46e5,#2563eb 60%,#06b6d4);color:#fff;padding:24px 20px 60px;border-radius:0 0 32px 32px;position:relative;overflow:hidden}
+.hero:before{content:"";position:absolute;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.12);right:-60px;top:-70px}
+.hero small{opacity:.85;text-transform:capitalize}
+.hero h1{margin:4px 0 14px;font-size:28px;letter-spacing:-.5px}
+.hstats{display:flex;gap:10px;position:relative}
+.hs{flex:1;background:rgba(255,255,255,.16);border-radius:18px;padding:12px 14px}
+.hs b{display:block;font-size:20px}.hs span{font-size:13px;opacity:.9}
+.pg{padding:0 14px;margin-top:-38px;position:relative}
+.card{background:var(--card);border-radius:24px;padding:18px;margin-bottom:16px;box-shadow:var(--sh)}
+.h2{font-size:19px;font-weight:800;margin:0 0 6px}
+.sub{font-size:13px;color:var(--mut);margin-bottom:12px}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.nav b{font-size:18px;text-transform:capitalize}
+.ib{width:44px;height:44px;border-radius:14px;border:0;background:var(--bg);color:var(--tx);font-size:20px}
+.btn{border:0;background:var(--bg);color:var(--tx);border-radius:16px;padding:13px 18px;font-size:16px;font-weight:700;min-height:48px}
+.btn.p{background:linear-gradient(135deg,var(--pri),var(--pri2));color:#fff;box-shadow:0 6px 14px rgba(79,70,229,.3)}
+.btn.g{background:var(--grn);color:#fff}.btn.r{background:var(--redbg);color:var(--red)}
+.btn.w{width:100%}
+.ghost{border:2px dashed var(--bd);background:transparent;color:var(--tx);border-radius:14px;padding:10px 12px;font-size:14px;font-weight:600}
+.ph{width:100%;border:2px dashed var(--pri);background:var(--bg);color:var(--pri);border-radius:16px;padding:14px;font-size:15px;font-weight:700}
+.prev img{width:100%;max-height:220px;object-fit:cover;border-radius:16px;margin-top:10px}
+.nota{width:100%;max-height:200px;object-fit:cover;border-radius:14px;margin-top:8px}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.dow{font-size:12px;font-weight:700;color:var(--mut);text-align:center;padding-bottom:4px}
+.day{aspect-ratio:1/1.1;border:0;border-radius:14px;background:var(--bg);font-size:15px;font-weight:600;display:flex;flex-direction:column;align-items:center;padding-top:6px;gap:4px;color:var(--tx)}
+.day.out{opacity:.28}.day.today{box-shadow:inset 0 0 0 2px var(--pri)}.day.sel{background:linear-gradient(135deg,var(--pri),var(--pri2));color:#fff}
+.dots{display:flex;flex-wrap:wrap;gap:3px;justify-content:center;padding:0 3px}.dot{width:7px;height:7px;border-radius:50%}
+.leg{display:flex;flex-wrap:wrap;gap:8px 14px;font-size:12px;color:var(--mut);margin-top:14px}
+.leg i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}
+.rc{display:flex;gap:12px;align-items:center;padding:12px;border-radius:18px;background:var(--bg);margin-top:10px;border-left:6px solid var(--bd)}
+.rc.s-cobrar{background:var(--redbg);border-left-color:var(--red);animation:glow 2s infinite}
+.rc.s-parcial{background-color:var(--ambbg);background-image:repeating-linear-gradient(135deg,transparent 0 9px,rgba(245,158,11,.14) 9px 18px);border-left-color:var(--amb);border-left-style:dashed;border-left-width:6px}
+.rc.s-pago{background:var(--grnbg);border-left-color:var(--grn)}
+.rc.s-alugado{background:var(--blubg);border-left-color:var(--blu)}
+.rc.s-agendado{border-left-color:var(--mut)}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(225,29,72,0)}50%{box-shadow:0 0 0 4px rgba(225,29,72,.25)}}
+.av{flex:0 0 46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:15px;box-shadow:0 4px 10px rgba(0,0,0,.15)}
+.av.sm{flex:0 0 40px;height:40px;font-size:18px}
+.ri{flex:1;min-width:0}
+.rn{font-weight:800;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rs{font-size:13px;color:var(--mut)}
+.rm{font-size:14px;margin-top:3px}.rm b{font-weight:800}
+.ro{font-size:13px;color:var(--mut);margin-top:3px}
+.pill{flex:0 0 auto;font-size:11px;font-weight:800;padding:5px 9px;border-radius:99px;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap}
+.p-cobrar{background:var(--red);color:#fff}
+.p-parcial{background:var(--amb);color:#1c1300;border:2px dashed #1c130055}
+.p-pago{background:var(--grn);color:#fff}
+.p-alugado{background:var(--blu);color:#fff}
+.p-agendado{background:var(--bd);color:var(--tx)}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px}
+.tile{border:2px solid var(--bd);background:var(--bg);color:var(--tx);border-radius:16px;padding:6px 6px 10px;font-size:13px;font-weight:700;display:flex;flex-direction:column;gap:6px;align-items:center}
+.tile.on{border-color:var(--pri);background:var(--card);box-shadow:0 0 0 3px rgba(79,70,229,.2)}
+.th{width:100%;height:50px;border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.th img{width:100%;height:100%;object-fit:cover}.th svg{width:92%}
+label{display:block;font-size:13px;font-weight:700;color:var(--mut);margin:16px 0 6px}
+input,select,textarea{width:100%;padding:14px;border:2px solid var(--bd);border-radius:14px;background:var(--bg);color:var(--tx);font:inherit;font-size:16px}
+textarea{min-height:80px;resize:vertical}
+input:focus,textarea:focus{outline:0;border-color:var(--pri)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mt{margin-top:18px}
+.seg{display:flex;gap:8px}
+.seg button{flex:1;padding:13px 4px;border-radius:14px;border:2px solid var(--bd);background:var(--bg);color:var(--tx);font-weight:700;font-size:14px}
+.seg .n.on{background:var(--red);border-color:var(--red);color:#fff}
+.seg .p.on{background:var(--amb);border-color:var(--amb);color:#1c1300}
+.seg .y.on{background:var(--grn);border-color:var(--grn);color:#fff}
+.pbox{margin-top:8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.chip{padding:10px 14px;border-radius:99px;border:2px solid var(--bd);background:var(--bg);color:var(--tx);font-size:14px;font-weight:600}
+.chip.on{background:var(--pri);border-color:var(--pri);color:#fff}
+.pr{display:flex;align-items:center;gap:10px;margin-top:8px;background:var(--bg);border-radius:14px;padding:8px 8px 8px 14px}
+.pr span{flex:1;font-weight:600;font-size:15px}
+.pr input{width:120px;padding:10px;text-align:right}
+.tot{display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding:14px 16px;border-radius:16px;background:linear-gradient(135deg,var(--pri),var(--pri2));color:#fff;font-weight:700}
+.tot b{font-size:22px}
+.sum{display:flex;justify-content:space-between;align-items:center;font-weight:800;margin:12px 0 4px;padding:14px 16px;border-radius:16px;background:var(--bg)}
+.sr{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:16px;background:var(--bg);margin-top:8px;border-left:6px solid var(--bd)}
+.sr .si{flex:1;min-width:0}.sr b{display:block}.sr small{color:var(--mut);font-size:13px}
+.sr.st-venc{border-left-color:var(--red)}.sr.st-perto{border-left-color:var(--amb)}.sr.st-ok{border-left-color:var(--grn)}.sr.st-sem{border-left-color:var(--mut);border-left-style:dotted}
+.sp{font-size:11px;font-weight:800;padding:5px 9px;border-radius:99px;white-space:nowrap}
+.st-venc .sp{background:var(--red);color:#fff}.st-perto .sp{background:var(--amb);color:#1c1300}.st-ok .sp{background:var(--grn);color:#fff}.st-sem .sp{background:var(--bd)}
+.kmbox{font-size:14px;color:var(--mut);margin:4px 0 2px}
+.mrec{background:var(--bg);border-radius:18px;padding:14px;margin-top:10px}
+.mh{display:flex;gap:12px;align-items:center}
+.mh b{display:block}.mh small{display:block;color:var(--mut);font-size:13px}
+.lines{margin-top:10px;border-top:1px dashed var(--bd);padding-top:8px}
+.lines div{display:flex;justify-content:space-between;padding:4px 0;font-size:14px}
+.warn{background:var(--redbg);color:var(--red);padding:12px 14px;border-radius:14px;font-size:15px;margin-top:14px;display:none;font-weight:600}
+.empty{color:var(--mut);text-align:center;padding:24px 10px;font-size:15px}.empty span{display:block;font-size:36px;margin-bottom:6px}
+.tabs{position:fixed;left:14px;right:14px;bottom:calc(12px + env(safe-area-inset-bottom,0px));max-width:572px;margin:0 auto;display:flex;background:var(--card);border-radius:26px;box-shadow:0 10px 30px rgba(30,40,90,.25);padding:6px;z-index:5}
+.tabs button{flex:1;border:0;background:none;color:var(--mut);padding:8px 2px;font-size:12px;font-weight:700;border-radius:18px;display:flex;flex-direction:column;gap:2px;align-items:center}
+.tabs button span{font-size:20px}
+.tabs button.on{background:linear-gradient(135deg,var(--pri),var(--pri2));color:#fff}
+.modal{position:fixed;inset:0;background:rgba(10,12,30,.55);display:none;align-items:flex-end;justify-content:center;z-index:20}.modal.show{display:flex}
+.sheet{background:var(--card);width:100%;max-width:600px;max-height:94%;overflow:auto;border-radius:28px 28px 0 0;padding:12px 20px calc(24px + env(safe-area-inset-bottom,0px))}
+.grab{width:44px;height:5px;border-radius:9px;background:var(--bd);margin:0 auto 14px}
+.ex{font-size:12px;background:var(--bg);padding:12px;border-radius:14px;white-space:pre-wrap;color:var(--tx);margin-top:10px}
+</style>
+</head>
+<body>
+<div class="hero"><small id="dt"></small><h1>🚗 Minha Frota</h1><div class="hstats" id="hs"></div></div>
+<div class="pg" id="app"></div>
+<div class="tabs">
+ <button data-t="ini"><span>🏠</span>Início</button>
+ <button data-t="man"><span>🔧</span>Manutenção</button>
+ <button data-t="cob"><span>💰</span>Cobrança</button>
+ <button data-t="mul"><span>🚨</span>Multas</button>
+</div>
+<div class="modal" id="md"><div class="sheet" id="sh"></div></div>
+<input type="file" id="ph" accept="image/*" style="display:none">
+
+<script>
+const CARS=[{id:'o26',n:'Onix MT',c:'#2563eb'},{id:'o20',n:'Onix LT',c:'#14b8a6'},{id:'o19',n:'Onix Joy',c:'#8b5cf6'}];
+const DEF=['Troca de óleo','Filtro de óleo','Filtro de ar','Filtro de combustível','Filtro do ar-condicionado','Pastilhas de freio','Fluido de freio','Alinhamento e balanceamento','Troca de pneus','Bateria','Velas de ignição','Correia dentada','Revisão geral','Lavagem'];
+// Intervalos de referência (km e meses). Confira sempre no manual do carro.
+const INT={'Troca de óleo':{km:10000,m:12},'Filtro de óleo':{km:10000,m:12},'Filtro de ar':{km:20000,m:24},'Filtro de combustível':{km:40000,m:null},'Filtro do ar-condicionado':{km:20000,m:12},'Pastilhas de freio':{km:30000,m:null},'Fluido de freio':{km:40000,m:24},'Alinhamento e balanceamento':{km:10000,m:12},'Troca de pneus':{km:40000,m:null},'Bateria':{km:null,m:36},'Velas de ignição':{km:30000,m:null},'Correia dentada':{km:60000,m:60},'Kit distribuição':{km:60000,m:60},'Revisão geral':{km:10000,m:12}};
+const KEY='agendaCarros';
+let S={rentals:[],maint:[],fines:[],services:[...DEF],photos:{},km:{}};
+try{const r=localStorage.getItem(KEY);if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
+S.services=S.services&&S.services.length?S.services:[...DEF];
+S.km=S.km||{};S.photos=S.photos||{};S.rentals=S.rentals||[];S.fines=S.fines||[];
+S.maint=(S.maint||[]).map(m=>{const items=(m.items||[]).map(i=>typeof i==='string'?{n:i,v:0}:i);return{id:m.id,car:m.car,date:m.date,km:m.km||'',oficina:m.oficina||'',items,total:Number(m.total)||items.reduce((a,i)=>a+(Number(i.v)||0),0),obs:m.obs||'',nota:m.nota||'',inc:!!m.inc}});
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S));return true}catch(e){alert('Sem espaço no aparelho. Apague algumas fotos.');return false}};
+
+let tab='ini',view=new Date(),sel=new Date(),F=null,G=null,E=null,PCB=null;
+let mCar='o26',mDate='',mKmF='',mOf='',mObs='',mNota='',mPrice={},mFOf='',mFCar='',sCar='o26';
+view.setDate(1);
+const $=id=>document.getElementById(id),p2=n=>String(n).padStart(2,'0');
+const dk=d=>d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate());
+const loc=d=>dk(d)+'T'+p2(d.getHours())+':'+p2(d.getMinutes());
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const car=id=>CARS.find(c=>c.id===id)||{id:'',n:'Carro não definido',c:'#888'};
+const fd=s=>{const d=new Date(s);if(isNaN(d))return '--';return p2(d.getDate())+'/'+p2(d.getMonth()+1)+' '+p2(d.getHours())+':'+p2(d.getMinutes())};
+const fdd=s=>{const [y,m,d]=(s||'--').split('-');return d+'/'+m+'/'+y};
+const money=v=>'R$ '+(Number(v)||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmt=n=>Math.round(Number(n)||0).toLocaleString('pt-BR');
+const initials=n=>(n||'?').trim().split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase();
+const valOf=r=>Number(r.val)||0, paidOf=r=>Number(r.pgto)||0;
+function curKm(id){return Math.max(Number(S.km[id])||0,0,...S.maint.filter(m=>m.car===id).map(m=>Number(m.km)||0))}
+function stR(r){const n=new Date(),a=new Date(r.start),b=new Date(r.end);if(r.paid)return 'pago';if(paidOf(r)>0)return 'parcial';if(b<n)return 'cobrar';if(a<=n)return 'alugado';return 'agendado'}
+const LBL={pago:'✓ Pago',parcial:'◐ Parcial',cobrar:'! A cobrar',alugado:'Alugado',agendado:'Agendado'};
+function fineSt(f){return f.paid?'pago':paidOf(f)>0?'parcial':'cobrar'}
+const LBLF={pago:'✓ Paga',parcial:'◐ Parcial',cobrar:'! A pagar'};
+function onDay(r,d){const a=new Date(d.getFullYear(),d.getMonth(),d.getDate()),b=new Date(a.getTime()+864e5);return new Date(r.start)<b&&new Date(r.end)>=a}
+function pic(id){const c=car(id);if(S.photos[id])return '<img src="'+S.photos[id]+'" alt="">';return '<svg viewBox="0 0 240 110"><ellipse cx="122" cy="98" rx="104" ry="7" fill="rgba(0,0,0,.25)"/><path d="M14 80V64q0-9 11-12l36-6q16-24 44-24h46q28 2 42 24l24 6q10 3 10 14v14z" fill="'+c.c+'"/><path d="M72 46q12-16 32-16h20v16zM130 30h22q16 2 26 16h-48z" fill="#d6ecfa"/><rect x="214" y="58" width="12" height="7" rx="3" fill="#fff7c2"/><rect x="14" y="60" width="9" height="6" rx="3" fill="#ff5a5a"/><circle cx="62" cy="80" r="17" fill="#1b1f2c"/><circle cx="62" cy="80" r="7" fill="#b8bfd0"/><circle cx="184" cy="80" r="17" fill="#1b1f2c"/><circle cx="184" cy="80" r="7" fill="#b8bfd0"/></svg>'}
+function bgv(id){const c=car(id).c;return 'background:linear-gradient(160deg,'+c+'33,'+c+'99)'}
+function tiles(cur,fn){return '<div class="tiles">'+CARS.map(c=>'<button class="tile '+(c.id===cur?'on':'')+'" data-id="'+c.id+'" onclick="'+fn+'(\''+c.id+'\')"><div class="th" style="'+bgv(c.id)+'">'+pic(c.id)+'</div>'+c.n+'</button>').join('')+'</div>'}
+function setTileOn(root,id){root.querySelectorAll('.tile').forEach(t=>t.classList.toggle('on',t.dataset.id===id))}
+
+function rCard(r,click){
+ const s=stR(r),c=car(r.car),v=valOf(r),p=paidOf(r);
+ let ml='';
+ if(s==='parcial')ml='Pagou <b>'+money(p)+'</b> · falta <b>'+money(Math.max(0,v-p))+'</b>';
+ else if(s==='cobrar')ml='Deve <b>'+money(Math.max(0,v-p))+'</b>';
+ else if(s==='pago')ml=v?'Quitado · '+money(v):'Quitado';
+ else if(v)ml='Total '+money(v);
+ return '<div class="rc s-'+s+'" '+(click?'onclick="openR(\''+r.id+'\')"':'')+'>'
+ +'<div class="av" style="background:'+c.c+'">'+esc(initials(r.name))+'</div>'
+ +'<div class="ri"><div class="rn">'+esc(r.name)+'</div><div class="rs">🚗 '+c.n+' · '+fd(r.start)+' → '+fd(r.end)+'</div>'
+ +(ml?'<div class="rm">'+ml+'</div>':'')+(r.obs?'<div class="ro">📝 '+esc(r.obs)+'</div>':'')
+ +(r.comp?'<div class="ro">🧾 comprovante anexado</div>':'')+'</div>'
+ +'<span class="pill p-'+s+'">'+LBL[s]+'</span></div>'}
+function fineCard(f){
+ const s=fineSt(f),c=car(f.car),v=valOf(f),p=paidOf(f);
+ let ml='';
+ if(s==='parcial')ml='Pagou <b>'+money(p)+'</b> · falta <b>'+money(Math.max(0,v-p))+'</b>';
+ else if(s==='cobrar')ml=v?'Valor <b>'+money(v)+'</b>':'Sem valor';
+ else ml=v?money(v):'';
+ return '<div class="rc s-'+s+'" onclick="openF(\''+f.id+'\')"><div class="av" style="background:'+c.c+'">'+esc(initials(f.who))+'</div>'
+ +'<div class="ri"><div class="rn">'+esc(f.desc||'Multa')+'</div><div class="rs">👤 '+esc(f.who||'Sem responsável')+' · '+c.n+' · '+fd(f.date)+'</div>'
+ +(ml?'<div class="rm">'+ml+'</div>':'')+(f.obs?'<div class="ro">📝 '+esc(f.obs)+'</div>':'')+'</div>'
+ +'<span class="pill p-'+(s==='cobrar'?'cobrar':s)+'">'+LBLF[s]+'</span></div>'
+ +(f.paid?'':'<button class="btn g w" style="margin-top:8px" onclick="payF(\''+f.id+'\')">✓ Marcar como paga</button>')}
+
+function render(){
+ document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===tab));
+ const n=new Date();
+ const alug=S.rentals.filter(r=>new Date(r.start)<=n&&new Date(r.end)>=n).length;
+ const receber=S.rentals.filter(r=>['cobrar','parcial'].includes(stR(r))).reduce((a,r)=>a+Math.max(0,valOf(r)-paidOf(r)),0);
+ $('hs').innerHTML='<div class="hs"><b>'+alug+'</b><span>alugados agora</span></div><div class="hs"><b>'+money(receber)+'</b><span>a receber</span></div>';
+ $('app').innerHTML=tab==='ini'?rIni():tab==='man'?rMan():tab==='cob'?rCob():rMul();
+}
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{tab=b.dataset.t;render();scrollTo(0,0)});
+$('dt').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
+
+/* ---------- INÍCIO ---------- */
+function rIni(){
+ const n=new Date();
+ const now=S.rentals.filter(r=>new Date(r.start)<=n&&new Date(r.end)>=n);
+ const tdy=dk(new Date()),sk=dk(sel),first=new Date(view.getFullYear(),view.getMonth(),1),start=new Date(view.getFullYear(),view.getMonth(),1-first.getDay());
+ let cells='';
+ for(let i=0;i<42;i++){const d=new Date(start.getFullYear(),start.getMonth(),start.getDate()+i);
+  const dots=S.rentals.filter(r=>onDay(r,d)).slice(0,6).map(r=>{const s=stR(r);const col=s==='cobrar'?'var(--red)':s==='parcial'?'var(--amb)':s==='pago'?'var(--grn)':car(r.car).c;return '<span class="dot" style="background:'+col+'"></span>'}).join('');
+  cells+='<button class="day '+(d.getMonth()!==view.getMonth()?'out':'')+' '+(dk(d)===tdy?'today':'')+' '+(dk(d)===sk?'sel':'')+'" onclick="pick(\''+dk(d)+'\')">'+d.getDate()+'<div class="dots">'+dots+'</div></button>'}
+ const list=S.rentals.filter(r=>onDay(r,sel)).sort((a,b)=>a.start.localeCompare(b.start));
+ return incompleteCard()+importCard()
+ +'<div class="card"><div class="h2">🚗 Alugados agora</div><div class="sub">Só os carros que estão com cliente neste momento</div>'
+ +(now.length?now.map(r=>rCard(r,1)).join(''):'<div class="empty"><span>🅿️</span>Nenhum carro alugado agora</div>')+'</div>'
+ +'<div class="card"><div class="nav"><button class="ib" onclick="mv(-1)">‹</button><b>'+view.toLocaleDateString('pt-BR',{month:'long',year:'numeric'})+'</b><button class="ib" onclick="mv(1)">›</button></div>'
+ +'<div class="grid">'+['D','S','T','Q','Q','S','S'].map(x=>'<div class="dow">'+x+'</div>').join('')+cells+'</div>'
+ +'<div class="leg">'+CARS.map(c=>'<span><i style="background:'+c.c+'"></i>'+c.n+'</span>').join('')+'<span><i style="background:var(--red)"></i>A cobrar</span><span><i style="background:var(--amb)"></i>Parcial</span><span><i style="background:var(--grn)"></i>Pago</span></div></div>'
+ +'<div class="card"><div class="nav"><div class="h2" style="text-transform:capitalize;margin:0">'+sel.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'short'})+'</div><button class="btn p" onclick="openR()">+ Aluguel</button></div>'
+ +(list.length?list.map(r=>rCard(r,1)).join(''):'<div class="empty"><span>🗓️</span>Nenhum aluguel neste dia</div>')+'</div>'
+ +'<div class="card"><div class="h2">📷 Fotos dos carros</div><div class="chips">'+CARS.map(c=>'<button class="ghost" onclick="fotoCar(\''+c.id+'\')">📷 '+c.n+'</button>').join('')+'</div></div>'
+ +bkCard()}
+function pick(k){const [y,m,d]=k.split('-').map(Number);sel=new Date(y,m-1,d);if(sel.getMonth()!==view.getMonth())view=new Date(y,m-1,1);render()}
+function mv(n){view=new Date(view.getFullYear(),view.getMonth()+n,1);render()}
+function fotoCar(id){pickPhoto(d=>{S.photos[id]=d;save();render()})}
+
+/* ---------- IMPORTAÇÃO E ITENS INCOMPLETOS ---------- */
+function importCard(){return '<div class="card"><div class="h2">📥 Importar lista</div><div class="sub">Uma seção por tipo, uma linha por registro, campos separados por ponto e vírgula (;). Deixe em branco o que não souber e complete depois.</div>'
+ +'<div class="sub"><b>Aluguel:</b> Cliente; Carro (MT, LT ou Joy); Saída; Chegada; Valor total; Já pago; Observação<br><b>Multa:</b> Data e hora; Carro; Responsável; Descrição; Valor; Já pago; Observação<br><b>Manutenção:</b> Data; Carro; Km; Oficina; Serviços separados por vírgula; Total; Observação</div>'
+ +'<pre class="ex">ALUGUÉIS\nJoão Silva; MT; 10/11/2026 08:00; 12/11/2026 18:00; 450; 200; caução paga\n\nMULTAS\n10/11/2026 14:30; LT; Maria Souza; Excesso de velocidade; 195,23; 0;\n\nMANUTENÇÃO\n05/11/2026; Joy; 45200; Oficina do Zé; Troca de óleo, Filtro de ar; 320;</pre>'
+ +'<textarea id="imp" style="min-height:160px;font-size:13px;margin-top:10px" placeholder="Cole aqui sua lista"></textarea>'
+ +'<button class="btn p w mt" onclick="importText()">Importar</button></div>'}
+function pDT(s,h){const m=(s||'').trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2}))?$/);if(!m)return '';return m[3]+'-'+p2(m[2])+'-'+p2(m[1])+'T'+p2(m[4]!=null?m[4]:h)+':'+p2(m[5]||0)}
+function pDate(s){const x=pDT(s,8);return x?x.slice(0,10):''}
+function pCar(s){const t=(s||'').toLowerCase();if(/\bmt\b|2026/.test(t))return 'o26';if(/\blt\b|2020/.test(t))return 'o20';if(/joy|2019/.test(t))return 'o19';return ''}
+function pMoney(s){let t=(s||'').replace(/[R$\s]/g,'');if(t.includes(','))t=t.replace(/\./g,'').replace(',','.');const v=parseFloat(t);return isNaN(v)?0:v}
+function importText(){
+ const lines=$('imp').value.split('\n');let sec='',nR=0,nF=0,nM=0,inc=0;
+ lines.forEach(raw=>{
+  const line=raw.trim();if(!line)return;
+  if(!/[;|]/.test(line)&&/^(alugu|multa|manuten)/i.test(line)){sec=line.slice(0,3).toLowerCase();return}
+  if(!sec)return;
+  const f=line.split(/[;|]/).map(x=>x.trim());
+  const id=String(Date.now())+Math.random().toString(36).slice(2,7);
+  if(sec==='alu'){
+   const r={id,name:f[0]||'',car:pCar(f[1]),start:pDT(f[2],8),end:pDT(f[3],18),val:pMoney(f[4]),pgto:pMoney(f[5]),obs:f[6]||'',comp:''};
+   r.paid=r.val>0&&r.pgto>=r.val;if(r.paid)r.pgto=r.val;
+   if(!r.name||!r.car||!r.start||!r.end)r.inc=true;
+   S.rentals.push(r);nR++;if(r.inc)inc++;
+  }else if(sec==='mul'){
+   const v=pMoney(f[4]),pg=pMoney(f[5]);
+   const x={id,car:pCar(f[1]),date:pDT(f[0],8),who:f[2]||'',desc:f[3]||'',val:v,pgto:pg,paid:v>0&&pg>=v,obs:f[6]||'',comp:''};
+   if(x.paid)x.pgto=v;
+   if(!x.date||!x.car||!x.who)x.inc=true;
+   S.fines.push(x);nF++;if(x.inc)inc++;
+  }else if(sec==='man'){
+   const dt=pDate(f[0]),cr=pCar(f[1]),km=Number((f[2]||'').replace(/\D/g,''))||'';
+   const svc=(f[4]||'').split(',').map(s=>s.trim()).filter(Boolean);
+   svc.forEach(s=>{if(!S.services.includes(s))S.services.push(s)});
+   const tot=pMoney(f[5]);
+   const items=svc.map(n=>({n,v:svc.length===1?tot:0}));
+   const x={id,car:cr,date:dt,km,oficina:f[3]||'',items,total:tot||items.reduce((a,i)=>a+i.v,0),obs:f[6]||'',nota:'',inc:false};
+   if(!dt||!cr||!km||!svc.length)x.inc=true;
+   S.maint.push(x);nM++;if(x.inc)inc++;
+   if(cr&&km)S.km[cr]=Math.max(km,Number(S.km[cr])||0);
+  }
+ });
+ if(!nR&&!nF&&!nM)return alert('Nenhum registro reconhecido. Confira se as seções começam com ALUGUÉIS, MULTAS ou MANUTENÇÃO.');
+ if(save()){$('imp').value='';alert('Importados: '+nR+' aluguéis, '+nF+' multas, '+nM+' manutenções.'+(inc?' '+inc+' ficaram incompletos: complete na lista ⚠️ Para completar.':''));render()}
+}
+function incompleteCard(){
+ const L=[];
+ S.rentals.filter(r=>r.inc).forEach(r=>{const miss=[!r.name&&'nome',!r.car&&'carro',!r.start&&'saída',!r.end&&'chegada'].filter(Boolean);L.push({t:'r',id:r.id,n:r.name||'Aluguel sem nome',m:miss})});
+ S.fines.filter(f=>f.inc).forEach(f=>{const miss=[!f.date&&'data',!f.car&&'carro',!f.who&&'responsável'].filter(Boolean);L.push({t:'f',id:f.id,n:f.desc||'Multa',m:miss})});
+ S.maint.filter(m=>m.inc).forEach(m=>{const miss=[!m.date&&'data',!m.car&&'carro',!m.km&&'km',!m.items.length&&'serviços'].filter(Boolean);L.push({t:'m',id:m.id,n:'Manutenção'+(m.oficina?' · '+m.oficina:''),m:miss})});
+ if(!L.length)return '';
+ return '<div class="card"><div class="h2">⚠️ Para completar</div><div class="sub">Itens da importação com campos em branco.</div>'
+ +L.map(x=>'<div class="sr st-perto"><div class="si"><b>'+esc(x.n)+'</b><small>Falta: '+x.m.join(', ')+'</small></div><button class="btn p" onclick="complete(\''+x.t+'\',\''+x.id+'\')">Completar</button></div>').join('')+'</div>'}
+function complete(t,id){if(t==='r')openR(id);else if(t==='f')openF(id);else editM(id)}
+function bkCard(){return '<div class="card"><div class="h2">💾 Backup</div><div class="sub">Seus dados ficam só neste aparelho. Gere o código e guarde (WhatsApp ou e-mail). Para trazer para outro aparelho, cole o código aqui.</div><button class="btn p w" onclick="bkExp()">Gerar código de backup</button><textarea id="bk" style="margin-top:10px;min-height:90px;font-size:12px" placeholder="O código aparece aqui. Para restaurar, cole o código e toque em Restaurar"></textarea><button class="btn w mt" onclick="bkImp()">Restaurar a partir do código</button></div>'}
+function bkExp(){$('bk').value=btoa(unescape(encodeURIComponent(JSON.stringify(S))))}
+function bkImp(){try{const t=JSON.parse(decodeURIComponent(escape(atob($('bk').value.trim()))));if(!confirm('Substituir os dados atuais pelo backup?'))return;S=Object.assign(S,t);save();render()}catch(e){alert('Código inválido.')}}
+
+/* ---------- ALUGUEL ---------- */
+function payBox(p){const o=p==='R'?F:G,m=o.mode||'n';
+ return '<label>Pagamento</label><div class="seg" id="seg'+p+'"><button data-m="n" class="n '+(m==='n'?'on':'')+'" onclick="setMode(\''+p+'\',\'n\')">Não pago</button><button data-m="p" class="p '+(m==='p'?'on':'')+'" onclick="setMode(\''+p+'\',\'p\')">Parcial</button><button data-m="y" class="y '+(m==='y'?'on':'')+'" onclick="setMode(\''+p+'\',\'y\')">Pago ✓</button></div>'
+ +'<div class="pbox" id="pb'+p+'" style="display:'+(m==='p'?'block':'none')+'"><label>Quanto já foi pago (R$)</label><input id="pp'+p+'" type="number" inputmode="decimal" value="'+(o.pgto||'')+'" placeholder="0,00"></div>'}
+function setMode(p,m){const o=p==='R'?F:G;o.mode=m;setTileOn($('seg'+p).parentNode,null);$('seg'+p).querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));$('pb'+p).style.display=m==='p'?'block':'none'}
+function setCarR(id){F.car=id;setTileOn($('sh'),id)}
+function setCompR(d){F.comp=d;$('fcomp').innerHTML='<img src="'+d+'">'}
+function pickCompR(){pickPhoto(setCompR)}
+function openR(id){
+ const r=id?S.rentals.find(x=>x.id===id):null;
+ const d0=new Date(sel.getFullYear(),sel.getMonth(),sel.getDate(),8),d1=new Date(sel.getFullYear(),sel.getMonth(),sel.getDate(),18);
+ F=r?{...r,mode:r.paid?'y':paidOf(r)>0?'p':'n'}:{id:'',name:'',car:'o26',start:loc(d0),end:loc(d1),val:'',pgto:'',obs:'',comp:'',mode:'n'};
+ $('sh').innerHTML='<div class="grab"></div><div class="nav"><div class="h2">'+(r?'Editar aluguel':'Novo aluguel')+'</div><button class="ib" onclick="closeM()">✕</button></div>'
+ +'<label>Nome do cliente</label><input id="fn" value="'+esc(F.name)+'" placeholder="Ex.: João Silva">'
+ +'<label>Carro</label>'+tiles(F.car,'setCarR')
+ +'<div class="row2"><div><label>Saída</label><input type="datetime-local" id="fs" value="'+F.start+'"></div><div><label>Chegada</label><input type="datetime-local" id="fe" value="'+F.end+'"></div></div>'
+ +'<label>Valor total (R$)</label><input id="fv" type="number" inputmode="decimal" value="'+(F.val||'')+'" placeholder="0,00">'
+ +payBox('R')
+ +'<label>Comprovante de pagamento</label><button class="ph" onclick="pickCompR()">📷 Anexar foto do comprovante</button><div id="fcomp" class="prev">'+(F.comp?'<img src="'+F.comp+'">':'')+'</div>'
+ +'<label>Observação</label><textarea id="fobs" placeholder="Ex.: caução, combustível, avarias...">'+esc(F.obs)+'</textarea>'
+ +'<div class="warn" id="fw"></div>'
+ +'<div class="row2 mt">'+(r?'<button class="btn r" onclick="delR()">Excluir</button>':'<span></span>')+'<button class="btn p" onclick="saveR()">Salvar</button></div>';
+ $('md').classList.add('show')}
+function closeM(){$('md').classList.remove('show')}
+$('md').onclick=e=>{if(e.target.id==='md')closeM()};
+function saveR(){
+ const name=$('fn').value.trim(),s=$('fs').value,e=$('fe').value,val=Number($('fv').value)||0,obs=$('fobs').value.trim(),w=$('fw');
+ const err=m=>{w.textContent=m;w.style.display='block'};
+ if(!name)return err('Digite o nome do cliente.');
+ if(!F.car)return err('Escolha o carro.');
+ if(!s||!e)return err('Informe saída e chegada.');
+ if(new Date(e)<=new Date(s))return err('A chegada precisa ser depois da saída.');
+ let pg=0;
+ if(F.mode==='y')pg=val;
+ if(F.mode==='p'){pg=Number($('ppR').value)||0;if(pg<=0)return err('Informe quanto já foi pago.');if(val&&pg>=val)return err('Esse valor cobre o total: escolha Pago ✓.')}
+ const cf=S.rentals.find(r=>r.id!==F.id&&r.car===F.car&&new Date(r.start)<new Date(e)&&new Date(r.end)>new Date(s));
+ const key=s+e+F.car;
+ if(cf&&w.dataset.ok!==key){w.dataset.ok=key;return err(car(F.car).n+' já está alugado para '+cf.name+' nesse período. Toque em Salvar de novo para confirmar.')}
+ const o={id:F.id||String(Date.now()),name,car:F.car,start:s,end:e,val,pgto:pg,paid:F.mode==='y',obs,comp:F.comp||''};
+ const i=S.rentals.findIndex(r=>r.id===o.id);
+ if(i>=0)S.rentals[i]=o;else S.rentals.push(o);
+ if(save()){closeM();render()}}
+function delR(){if(confirm('Excluir este aluguel?')){S.rentals=S.rentals.filter(r=>r.id!==F.id);save();closeM();render()}}
+
+/* ---------- COBRANÇA ---------- */
+function baixa(id){const r=S.rentals.find(x=>x.id===id);if(r){r.paid=true;r.pgto=valOf(r);save();render()}}
+function rCob(){
+ const dev=S.rentals.filter(r=>stR(r)==='cobrar').sort((a,b)=>a.end.localeCompare(b.end));
+ const par=S.rentals.filter(r=>stR(r)==='parcial').sort((a,b)=>a.end.localeCompare(b.end));
+ const pg=S.rentals.filter(r=>stR(r)==='pago').sort((a,b)=>b.end.localeCompare(a.end)).slice(0,15);
+ const tot=[...dev,...par].reduce((a,r)=>a+Math.max(0,valOf(r)-paidOf(r)),0);
+ return '<div class="card"><div class="h2">💰 Cobrança</div><div class="sum"><span>Falta receber</span><span>'+money(tot)+'</span></div></div>'
+ +'<div class="card"><div class="h2">🔴 A cobrar</div><div class="sub">Carro já devolvido e sem pagamento</div>'
+ +(dev.length?dev.map(r=>rCard(r,1)+'<button class="btn g w" style="margin-top:8px" onclick="baixa(\''+r.id+'\')">✓ Dar baixa total</button>').join(''):'<div class="empty"><span>🎉</span>Ninguém devendo</div>')+'</div>'
+ +'<div class="card"><div class="h2">🟡 Parcialmente pago</div>'
+ +(par.length?par.map(r=>rCard(r,1)+'<button class="btn g w" style="margin-top:8px" onclick="baixa(\''+r.id+'\')">✓ Receber restante ('+money(Math.max(0,valOf(r)-paidOf(r)))+')</button>').join(''):'<div class="empty"><span>🧾</span>Nenhum pagamento parcial</div>')+'</div>'
+ +'<div class="card"><div class="h2">✅ Já foi pago</div>'+(pg.length?pg.map(r=>rCard(r,1)).join(''):'<div class="empty"><span>🧾</span>Nada ainda</div>')+'</div>'}
+
+/* ---------- MULTAS ---------- */
+function payF(id){const f=S.fines.find(x=>x.id===id);if(f){f.paid=true;f.pgto=valOf(f);save();render()}}
+function rMul(){
+ const l=[...S.fines].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+ const tot=l.filter(f=>!f.paid).reduce((a,f)=>a+Math.max(0,valOf(f)-paidOf(f)),0);
+ return '<div class="card"><div class="nav"><div class="h2" style="margin:0">🚨 Multas</div><button class="btn p" onclick="openF()">+ Multa</button></div>'
+ +(tot?'<div class="sum"><span>Em aberto</span><span>'+money(tot)+'</span></div>':'')
+ +(l.length?l.map(fineCard).join(''):'<div class="empty"><span>✅</span>Nenhuma multa registrada</div>')+'</div>'}
+function setCarF(id){G.car=id;setTileOn($('sh'),id);guessF()}
+function setCompF(d){G.comp=d;$('gcomp').innerHTML='<img src="'+d+'">'}
+function pickCompF(){pickPhoto(setCompF)}
+function guessF(){
+ const dt=$('gd').value;if(!dt)return;const w=$('gw'),h=$('gh');
+ const r=S.rentals.find(x=>x.car===G.car&&new Date(x.start)<=new Date(dt)&&new Date(x.end)>=new Date(dt));
+ if(r){if(!w.value||w.value===G.auto)w.value=r.name;G.auto=r.name;h.textContent='Nesse horário o '+car(G.car).n+' estava alugado por '+r.name+'.'}
+ else h.textContent='Nenhum aluguel nesse horário. Digite o responsável.'}
+function setModeG(m){setMode('G',m)}
+function openF(id){
+ const f=id?S.fines.find(x=>x.id===id):null;
+ G=f?{...f,mode:f.paid?'y':paidOf(f)>0?'p':'n'}:{id:'',car:'o26',date:loc(new Date()),desc:'',val:'',who:'',pgto:'',obs:'',comp:'',mode:'n'};
+ const names=[...new Set(S.rentals.map(r=>r.name).filter(Boolean))];
+ $('sh').innerHTML='<div class="grab"></div><div class="nav"><div class="h2">'+(f?'Editar multa':'Nova multa')+'</div><button class="ib" onclick="closeM()">✕</button></div>'
+ +'<label>Carro</label>'+tiles(G.car,'setCarF')
+ +'<label>Data e hora da infração</label><input type="datetime-local" id="gd" value="'+(G.date||'')+'" onchange="guessF()">'
+ +'<label>Descrição</label><input id="gx" value="'+esc(G.desc)+'" placeholder="Ex.: Excesso de velocidade">'
+ +'<label>Valor (R$)</label><input id="gv" type="number" inputmode="decimal" value="'+(G.val||'')+'" placeholder="0,00">'
+ +'<label>Responsável</label><input id="gw" list="cl" value="'+esc(G.who)+'" placeholder="Nome do cliente"><datalist id="cl">'+names.map(n=>'<option value="'+esc(n)+'">').join('')+'</datalist><small id="gh" style="color:var(--mut);display:block;margin-top:6px"></small>'
+ +payBox('G')
+ +'<label>Comprovante de pagamento</label><button class="ph" onclick="pickCompF()">📷 Anexar foto do comprovante</button><div id="gcomp" class="prev">'+(G.comp?'<img src="'+G.comp+'">':'')+'</div>'
+ +'<label>Observação</label><textarea id="go" placeholder="Ex.: nº do auto, prazo de recurso...">'+esc(G.obs)+'</textarea>'
+ +'<div class="warn" id="gwn"></div>'
+ +'<div class="row2 mt">'+(f?'<button class="btn r" onclick="delF()">Excluir</button>':'<span></span>')+'<button class="btn p" onclick="saveF()">Salvar</button></div>';
+ $('md').classList.add('show');if(!f)guessF()}
+function saveF(){
+ const d=$('gd').value,w=$('gw').value.trim(),e=$('gwn');const er=t=>{e.textContent=t;e.style.display='block'};
+ if(!d||!w)return er('Informe a data e o responsável.');
+ if(!G.car)return er('Escolha o carro.');
+ const val=Number($('gv').value)||0;let pg=0;
+ if(G.mode==='y')pg=val;
+ if(G.mode==='p'){pg=Number($('ppG').value)||0;if(pg<=0)return er('Informe quanto já foi pago.');if(val&&pg>=val)return er('Esse valor cobre o total: escolha Paga ✓.')}
+ const o={id:G.id||String(Date.now()),car:G.car,date:d,desc:$('gx').value.trim(),val,who:w,pgto:pg,paid:G.mode==='y',obs:$('go').value.trim(),comp:G.comp||''};
+ const i=S.fines.findIndex(x=>x.id===o.id);
+ if(i>=0)S.fines[i]=o;else S.fines.push(o);
+ if(save()){closeM();render()}}
+function delF(){if(confirm('Excluir esta multa?')){S.fines=S.fines.filter(x=>x.id!==G.id);save();closeM();render()}}
+
+/* ---------- MANUTENÇÃO ---------- */
+function schedule(id){
+ const now=new Date(),cur=curKm(id),out=[];
+ Object.keys(INT).forEach(name=>{
+  const recs=S.maint.filter(m=>m.car===id&&m.items.some(i=>i.n===name)).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  const last=recs[0],I=INT[name];
+  let dueKm=null,dueD=null,rk=null,rd=null,st='sem';
+  if(last){
+   const lk=Number(last.km)||0;
+   if(I.km&&lk){dueKm=lk+I.km;rk=dueKm-cur}
+   if(I.m&&last.date){dueD=new Date(last.date+'T12:00');dueD.setMonth(dueD.getMonth()+I.m);rd=Math.ceil((dueD-now)/864e5)}
+   st='ok';
+   if((rk!==null&&rk<=0)||(rd!==null&&rd<=0))st='venc';
+   else if((rk!==null&&rk<=1000)||(rd!==null&&rd<=30))st='perto';
+  }
+  out.push({name,last,dueKm,dueD,rk,rd,st});
+ });
+ const ord={venc:0,perto:1,sem:2,ok:3};
+ return out.sort((a,b)=>ord[a.st]-ord[b.st]);
+}
+function schTxt(x){
+ if(!x.last)return 'Nenhum registro ainda';
+ const parts=[];
+ if(x.rk!==null)parts.push(x.rk<=0?'vencida há '+fmt(-x.rk)+' km':'faltam '+fmt(x.rk)+' km');
+ if(x.rd!==null)parts.push((x.rd<=0?'vencida em ':'até ')+p2(x.dueD.getDate())+'/'+p2(x.dueD.getMonth()+1)+'/'+x.dueD.getFullYear());
+ if(!parts.length)return 'Sem km informado no último registro';
+ return parts.join(' · ')+(x.dueKm!==null?' (próxima em '+fmt(x.dueKm)+' km)':'')}
+const SPL={venc:'Vencida',perto:'Em breve',ok:'Em dia',sem:'Sem histórico'};
+function schRow(x){return '<div class="sr st-'+x.st+'"><div class="si"><b>'+x.name+'</b><small>'+schTxt(x)+'</small></div><span class="sp">'+SPL[x.st]+'</span></div>'}
+function sc(id){sCar=id;render()}
+function ofsList(){return [...new Set(S.maint.map(m=>m.oficina).filter(Boolean))]}
+function tgS(i){const n=S.services[i];if(n in mPrice)delete mPrice[n];else mPrice[n]='';render()}
+function pv(i,v){const k=Object.keys(mPrice)[i];if(k!==undefined)mPrice[k]=v;calcT()}
+function calcT(){const t=$('mtot');if(t)t.textContent=money(Object.values(mPrice).reduce((a,v)=>a+(Number(v)||0),0))}
+function addS(){const v=$('ns').value.trim();if(!v)return;if(!S.services.includes(v))S.services.push(v);if(!(v in mPrice))mPrice[v]='';save();render()}
+function mc(id){mCar=id;mKmF=String(curKm(id)||'');render()}
+function fOf(i){mFOf=i<0?'':ofsList()[i]||'';render()}
+function fCar(id){mFCar=id;render()}
+function pickNota(){pickPhoto(d=>{mNota=d;render()})}
+function rMan(){
+ const ofs=ofsList();
+ const items=Object.keys(mPrice);
+ const total=items.reduce((a,k)=>a+(Number(mPrice[k])||0),0);
+ const hist=S.maint.filter(m=>(!mFCar||m.car===mFCar)&&(!mFOf||m.oficina===mFOf)).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+ const histTot=hist.reduce((a,m)=>a+m.total,0);
+ return '<div class="card"><div class="h2">📅 Próximas manutenções</div><div class="sub">Calculado pela quilometragem e pela data de cada serviço. Valores de referência, confira no manual.</div>'
+ +'<div class="chips">'+CARS.map(c=>'<button class="chip '+(sCar===c.id?'on':'')+'" onclick="sc(\''+c.id+'\')">'+c.n+'</button>').join('')+'</div>'
+ +'<div class="kmbox">Km atual do '+car(sCar).n+': <b>'+fmt(curKm(sCar))+' km</b></div>'
+ +schedule(sCar).map(schRow).join('')+'</div>'
+ +'<div class="card"><div class="h2">🔧 Registrar manutenção</div>'
+ +'<label>Carro</label>'+tiles(mCar,'mc')
+ +'<div class="row2"><div><label>Data</label><input type="date" value="'+mDate+'" oninput="mDate=this.value"></div><div><label>Km atual do carro</label><input type="number" inputmode="numeric" value="'+mKmF+'" placeholder="ex.: 45200" oninput="mKmF=this.value"></div></div>'
+ +'<label>Mecânica / oficina</label><input list="ofs" value="'+esc(mOf)+'" placeholder="Nome da oficina" oninput="mOf=this.value"><datalist id="ofs">'+ofs.map(o=>'<option value="'+esc(o)+'">').join('')+'</datalist>'
+ +'<label>Serviços feitos (toque para marcar)</label>'
+ +'<div class="chips">'+S.services.map((s,i)=>'<button class="chip '+(s in mPrice?'on':'')+'" onclick="tgS('+i+')">'+esc(s)+'</button>').join('')+'</div>'
+ +(items.length?'<label>Valor de cada serviço</label>'+items.map((k,i)=>'<div class="pr"><span>'+esc(k)+'</span><input type="number" inputmode="decimal" placeholder="R$" value="'+(mPrice[k]||'')+'" oninput="pv('+i+',this.value)"></div>').join(''):'')
+ +'<div class="tot"><span>Total da manutenção</span><b id="mtot">'+money(total)+'</b></div>'
+ +'<label>Outro serviço</label><div class="row2"><input id="ns" placeholder="Digite o serviço"><button class="btn p" onclick="addS()">+ Adicionar</button></div>'
+ +'<label>Observação</label><textarea placeholder="Ex.: peça trocada, próxima revisão..." oninput="mObs=this.value">'+esc(mObs)+'</textarea>'
+ +'<label>Nota fiscal / comprovante</label><button class="ph" onclick="pickNota()">📷 Anexar foto da nota</button>'+(mNota?'<div class="prev"><img src="'+mNota+'"></div>':'')
+ +'<button class="btn p w mt" onclick="saveM()">Salvar manutenção</button></div>'
+ +'<div class="card"><div class="h2">📋 Histórico</div>'
+ +'<label style="margin-top:6px">Filtrar por mecânica</label><div class="chips"><button class="chip '+(!mFOf?'on':'')+'" onclick="fOf(-1)">Todas</button>'+ofs.map((o,i)=>'<button class="chip '+(mFOf===o?'on':'')+'" onclick="fOf('+i+')">'+esc(o)+'</button>').join('')+'</div>'
+ +'<label>Filtrar por carro</label><div class="chips"><button class="chip '+(!mFCar?'on':'')+'" onclick="fCar(\'\')">Todos</button>'+CARS.map(c=>'<button class="chip '+(mFCar===c.id?'on':'')+'" onclick="fCar(\''+c.id+'\')">'+c.n+'</button>').join('')+'</div>'
+ +(hist.length?'<div class="sum"><span>'+hist.length+' manutenç'+(hist.length>1?'ões':'ão')+'</span><span>'+money(histTot)+'</span></div>'+hist.map(mRec).join(''):'<div class="empty"><span>🛠️</span>Nenhuma manutenção encontrada</div>')+'</div>'}
+function mRec(m){const c=car(m.car);
+ return '<div class="mrec"><div class="mh"><div class="av sm" style="background:'+c.c+'">🔧</div><div><b>'+c.n+'</b><small>'+fdd(m.date)+' · '+(m.km?fmt(m.km)+' km':'sem km')+'</small><small>🏭 '+esc(m.oficina||'Sem oficina')+'</small></div></div>'
+ +'<div class="lines">'+m.items.map(i=>'<div><span>'+esc(i.n)+'</span><b>'+money(i.v)+'</b></div>').join('')+'</div>'
+ +'<div class="sum" style="margin:8px 0 0"><span>Total</span><span>'+money(m.total)+'</span></div>'
+ +(m.obs?'<small style="display:block;margin-top:8px;color:var(--mut)">📝 '+esc(m.obs)+'</small>':'')
+ +(m.nota?'<img class="nota" src="'+m.nota+'">':'')
+ +'<button class="btn w" style="margin-top:10px" onclick="editM(\''+m.id+'\')">Editar</button><button class="btn r w" style="margin-top:8px" onclick="delM(\''+m.id+'\')">'+(DEL===m.id?'Confirmar exclusão':'Excluir')+'</button></div>'}
+function saveM(){
+ const items=Object.keys(mPrice).map(n=>({n,v:Number(mPrice[n])||0}));
+ if(!items.length)return alert('Marque pelo menos um serviço.');
+ const km=Number(mKmF);
+ if(!km)return alert('Informe a quilometragem atual do carro.');
+ S.km[mCar]=Math.max(km,Number(S.km[mCar])||0);
+ S.maint.push({id:String(Date.now()),car:mCar,date:mDate||dk(new Date()),km,oficina:mOf.trim(),items,total:items.reduce((a,i)=>a+i.v,0),obs:mObs.trim(),nota:mNota||'',inc:false});
+ mPrice={};mOf='';mObs='';mNota='';mKmF=String(km);
+ if(save())render()}
+let DEL=null;function delM(id){if(DEL!==id){DEL=id;render();return}DEL=null;S.maint=S.maint.filter(m=>m.id!==id);save();closeM();render()}
+function setCarE(id){E.car=id;setTileOn($('sh'),id)}
+function editM(id){
+ const m=S.maint.find(x=>x.id===id);if(!m)return;
+ E={...m};
+ $('sh').innerHTML='<div class="grab"></div><div class="nav"><div class="h2">Editar manutenção</div><button class="ib" onclick="closeM()">✕</button></div>'
+ +'<label>Carro</label>'+tiles(E.car,'setCarE')
+ +'<div class="row2"><div><label>Data</label><input type="date" id="ed" value="'+(E.date||'')+'"></div><div><label>Km</label><input type="number" id="ek" inputmode="numeric" value="'+(E.km||'')+'"></div></div>'
+ +'<label>Oficina</label><input id="eo" value="'+esc(E.oficina)+'">'
+ +'<label>Serviços (separados por vírgula)</label><input id="es" value="'+esc(E.items.map(i=>i.n).join(', '))+'">'
+ +'<label>Total (R$)</label><input id="et" type="number" inputmode="decimal" value="'+(E.total||'')+'">'
+ +'<label>Nota fiscal / comprovante</label><button class="ph" onclick="pickNotaE()">📷 Anexar ou trocar foto da nota</button><div id="enota" class="prev">'+(E.nota?'<img src="'+E.nota+'">':'')+'</div>'+'<label>Observação</label><textarea id="eob">'+esc(E.obs)+'</textarea>'
+ +'<div class="warn" id="ew"></div>'
+ +'<div class="row2 mt"><button class="btn r" onclick="delM(\''+id+'\')">Excluir</button><button class="btn p" onclick="saveE()">Salvar</button></div>';
+ $('md').classList.add('show')}
+function setNotaE(d){E.nota=d;$('enota').innerHTML='<img src="'+d+'">'}
+function pickNotaE(){pickPhoto(setNotaE)}
+function saveE(){
+ const d=$('ed').value,k=Number($('ek').value)||0,names=$('es').value.split(',').map(x=>x.trim()).filter(Boolean),w=$('ew');
+ const err=m=>{w.textContent=m;w.style.display='block'};
+ if(!E.car)return err('Escolha o carro.');
+ if(!d||!k||!names.length)return err('Preencha data, km e serviços.');
+ const i=S.maint.findIndex(x=>x.id===E.id);if(i<0)return err('Registro não encontrado.');
+ const old=S.maint[i],total=Number($('et').value)||0;
+ names.forEach(n=>{if(!S.services.includes(n))S.services.push(n)});
+ const items=names.map(n=>{const o=old.items.find(x=>x.n===n);return{n,v:o?o.v:(names.length===1?total:0)}});
+ S.maint[i]={...old,car:E.car,date:d,km:k,oficina:$('eo').value.trim(),items,total:total||items.reduce((a,x)=>a+x.v,0),obs:$('eob').value.trim(),nota:E.nota||'',inc:false};
+ S.km[E.car]=Math.max(k,Number(S.km[E.car])||0);
+ if(save()){closeM();render()}}
+
+/* ---------- FOTOS ---------- */
+const ph=$('ph');
+function pickPhoto(cb){PCB=cb;ph.value='';ph.click()}
+ph.onchange=e=>{const f=e.target.files[0];if(!f||!PCB)return;const fr=new FileReader();
+ fr.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,900/im.width),cv=document.createElement('canvas');cv.width=im.width*k;cv.height=im.height*k;cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);PCB(cv.toDataURL('image/jpeg',.7))};im.src=fr.result};
+ fr.readAsDataURL(f)};
+
+mDate=dk(new Date());
+mKmF=String(curKm(mCar)||'');
+render();
+</script>
+</body>
+</html>
